@@ -1,0 +1,14 @@
+﻿student_dashboard_verified_1771667475756.png
+incharge_dashboard_verified_1771667460398.png
+admin_dashboard_verified_1771667444920.png
+media__1771667050377.png
+media__1771667048458.png
+media__1771667045306.png
+student_login_page_1771666625186.png
+incharge_login_page_1771666605406.png
+admin_login_page_1771666582157.png
+role_selection_page_1771666561629.png
+media__1771665899902.png
+media__1771665896733.png
+media__1771665894273.png
+media__1771665889663.png
