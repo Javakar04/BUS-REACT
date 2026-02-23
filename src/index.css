@@ -182,6 +182,13 @@ body {
   font-size: 0.9375rem;
   border-radius: var(--radius-lg);
   transition: var(--transition);
+  background: transparent;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
 }
 
 .nav-item:hover {

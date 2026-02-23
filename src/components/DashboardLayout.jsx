@@ -51,7 +51,6 @@ const DashboardLayout = ({ children, role, title, navItems, activeItem, onItemCl
                                     key={index}
                                     onClick={() => onItemClick(item.id || item.label)}
                                     className={`nav-item ${isSelected ? 'active' : ''}`}
-                                    style={{ width: '100%', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}
                                 >
                                     {item.icon && <item.icon className="nav-icon" />}
                                     {item.label}
