@@ -98,11 +98,74 @@ const StudentPortal = () => {
             case 'transport':
                 return (
                     <div className="section-card animate-fade-in">
-                        <h3 className="section-title"><BusFront size={20} className="text-primary" /> Bus Details</h3>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                            <h3 className="section-title" style={{ marginBottom: 0 }}><BusFront size={20} className="text-primary" /> Bus Details</h3>
+                            <div className="glass" style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 600 }}>
+                                <motion.div
+                                    animate={{ opacity: [1, 0.4, 1] }}
+                                    transition={{ duration: 1.5, repeat: Infinity }}
+                                    style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff3b30' }}
+                                />
+                                LIVE TRACKING ACTIVE
+                            </div>
+                        </div>
                         <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
                             <div className="info-item"><span className="info-key">Bus Route</span><span className="info-val">Route #12 (Saravanampatty)</span></div>
                             <div className="info-item"><span className="info-key">Boarding Point</span><span className="info-val">Signal Junction</span></div>
                             <div className="info-item"><span className="info-key">Pick-up Time</span><span className="info-val">07:45 AM</span></div>
+                            <div className="info-item"><span className="info-key">Current Status</span><span className="info-val" style={{ color: 'var(--primary)' }}>In Transit - Near Peelamedu</span></div>
+                        </div>
+                    </div>
+                );
+            case 'requests':
+                return (
+                    <div className="section-card animate-fade-in">
+                        <h3 className="section-title"><Target size={20} className="text-primary" /> Service Request Submission</h3>
+                        <form className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }} onSubmit={(e) => { e.preventDefault(); alert('Request submitted successfully!'); }}>
+                            <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                                <div className="form-group">
+                                    <label className="form-label">Request Type</label>
+                                    <select className="form-input">
+                                        <option>Route Change</option>
+                                        <option>Boarding Point Update</option>
+                                        <option>Maintenance Issue</option>
+                                        <option>Other</option>
+                                    </select>
+                                </div>
+                                <div className="form-group">
+                                    <label className="form-label">Urgency</label>
+                                    <select className="form-input">
+                                        <option>Low</option>
+                                        <option>Medium</option>
+                                        <option>High (Immediate attention)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Detailed Description</label>
+                                <textarea className="form-input" style={{ minHeight: '120px', resize: 'vertical' }} placeholder="Specify your request details..."></textarea>
+                            </div>
+                            <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem', width: '100%' }}>Submit Request</button>
+                        </form>
+                    </div>
+                );
+            case 'support':
+                return (
+                    <div className="section-card animate-fade-in">
+                        <h3 className="section-title"><AlertCircle size={20} className="text-primary" /> Frequently Asked Questions</h3>
+                        <div style={{ display: 'grid', gap: '1rem' }}>
+                            {[
+                                { q: 'How do I track my bus in real-time?', a: 'You can use the Live Tracking feature in the Transport Details tab.' },
+                                { q: 'What happens if I forget my ID card?', a: 'Contact your Bus Incharge immediately. They can manually verify your details.' },
+                                { q: 'How can I change my route?', a: 'Submit a Route Change request through the Service Requests tab. Admin approval takes 24-48 hours.' },
+                            ].map((faq, i) => (
+                                <div key={i} className="glass" style={{ padding: '1.25rem', borderRadius: 'var(--radius-lg)' }}>
+                                    <div style={{ fontWeight: 700, marginBottom: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+                                        <span className="text-primary">Q:</span> {faq.q}
+                                    </div>
+                                    <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 0 }}>{faq.a}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 );
