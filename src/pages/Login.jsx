@@ -16,11 +16,26 @@ const Login = () => {
         }
     };
 
+    const [error, setError] = React.useState('');
+
     const handleLogin = (e) => {
         e.preventDefault();
-        if (role === 'admin') navigate('/admin/dashboard');
-        else if (role === 'incharge') navigate('/incharge/dashboard');
-        else if (role === 'student') navigate('/student/dashboard');
+        const username = e.target[0].value;
+        const password = e.target[1].value;
+
+        // Simple Mock Auth Logic
+        if (role === 'admin' && username === 'admin' && password === 'admin') {
+            localStorage.setItem('user_role', 'admin');
+            navigate('/admin/dashboard');
+        } else if (role === 'incharge' && username === 'incharge' && password === 'incharge') {
+            localStorage.setItem('user_role', 'incharge');
+            navigate('/incharge/dashboard');
+        } else if (role === 'student' && username === 'student' && password === 'student') {
+            localStorage.setItem('user_role', 'student');
+            navigate('/student/dashboard');
+        } else {
+            setError('Invalid username or password. Please try again.');
+        }
     };
 
     return (
@@ -47,6 +62,24 @@ const Login = () => {
 
                 <h2>{getTitle()}</h2>
                 <p className="subtitle">Please enter your credentials to proceed</p>
+
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        style={{
+                            padding: '0.75rem',
+                            borderRadius: 'var(--radius-md)',
+                            background: 'hsla(0, 84%, 60%, 0.1)',
+                            color: 'hsl(0, 84%, 60%)',
+                            fontSize: '0.85rem',
+                            fontWeight: 600,
+                            marginBottom: '1rem'
+                        }}
+                    >
+                        {error}
+                    </motion.div>
+                )}
 
                 <form style={{ marginTop: '1rem' }} onSubmit={handleLogin}>
                     <div className="form-group">

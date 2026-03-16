@@ -19,6 +19,7 @@ import {
     Clock
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const AnimatedClock = ({ size = 24, className, style }) => (
     <motion.span
@@ -34,31 +35,46 @@ const AnimatedClock = ({ size = 24, className, style }) => (
 const InchargeDashboard = () => {
     const [activeTab, setActiveTab] = React.useState('overview');
 
-    // Manageable State
-    const [boardingList, setBoardingList] = React.useState([
+    // Manageable Persistent State
+    const [boardingList, setBoardingList] = useLocalStorage('incharge_boarding', [
         { id: 1, name: 'Rahul Sharma', idCard: 'KPR-24-CS-042', status: 'Pending' },
         { id: 2, name: 'Priya Mani', idCard: 'KPR-24-EC-015', status: 'Boarded' },
         { id: 3, name: 'Arjun Das', idCard: 'KPR-24-ME-089', status: 'Boarded' },
         { id: 4, name: 'Deepika R.', idCard: 'KPR-24-CS-012', status: 'Pending' },
     ]);
 
-    const [requests, setRequests] = React.useState([
+    const [requests, setRequests] = useLocalStorage('incharge_requests', [
         { id: 1, student: 'Siddharth S.', type: 'Route Change', date: '2026-02-23', status: 'Pending' },
         { id: 2, student: 'Ananya P.', type: 'Maintenance', date: '2026-02-22', status: 'Pending' },
     ]);
 
-    const [inspection, setInspection] = React.useState([
-        { id: 1, item: 'Brake System', status: 'Good', icon: ShieldCheck },
-        { id: 2, item: 'Tire Pressure', status: 'Good', icon: Settings2 },
-        { id: 3, item: 'Headlights & Blinkers', status: 'Checked', icon: ClipboardCheck },
-        { id: 4, item: 'Engine Oil Level', status: 'Good', icon: Settings2 },
-        { id: 5, item: 'Interior Cleanliness', status: 'Pending', icon: Users },
+    const [inspection, setInspection] = useLocalStorage('incharge_inspection', [
+        { id: 1, item: 'Brake System', status: 'Good', icon: 'ShieldCheck' },
+        { id: 2, item: 'Tire Pressure', status: 'Good', icon: 'Settings2' },
+        { id: 3, item: 'Headlights & Blinkers', status: 'Checked', icon: 'ClipboardCheck' },
+        { id: 4, item: 'Engine Oil Level', status: 'Good', icon: 'Settings2' },
+        { id: 5, item: 'Interior Cleanliness', status: 'Pending', icon: 'Users' },
     ]);
 
     const [inbox, setInbox] = React.useState([
         { id: 1, from: 'Transport Admin', subject: 'Exam Special Bus', msg: 'Special buses will run at 5 PM for exam students.', time: '09:00 AM', read: false },
         { id: 2, from: 'Rahul Sharma (Student)', subject: 'Leave Information', msg: 'I will not be using the bus today due to fever.', time: 'Yesterday', read: true },
     ]);
+
+    const [tripStatus, setTripStatus] = useLocalStorage('bus_trip_active', false);
+    const [currentLocation, setCurrentLocation] = useLocalStorage('bus_current_location', 'Campus Depot');
+
+    const toggleTrip = () => {
+        const newStatus = !tripStatus;
+        setTripStatus(newStatus);
+        if (newStatus) {
+            setCurrentLocation('Starting - Main Gate');
+            alert("Trip Started! Students will see live updates.");
+        } else {
+            setCurrentLocation('Trip Ended - Depot');
+            alert("Trip Ended.");
+        }
+    };
 
     const toggleBoarding = (id) => {
         setBoardingList(boardingList.map(s =>
@@ -110,8 +126,24 @@ const InchargeDashboard = () => {
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="section-card">
                             <h3 className="section-title">Operational Controls</h3>
                             <div className="quick-actions" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+                                <button
+                                    className={`btn ${tripStatus ? 'btn-danger' : 'btn-primary'}`}
+                                    onClick={toggleTrip}
+                                    style={{ width: '100%', height: '50px', fontSize: '1rem' }}
+                                >
+                                    <Bus size={18} /> {tripStatus ? 'End Current Trip' : 'Start Morning Trip'}
+                                </button>
+                                {tripStatus && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        style={{ color: 'var(--primary)', fontWeight: 600, marginTop: '1rem', fontSize: '0.9rem', textAlign: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                                    >
+                                        <motion.span animate={{ opacity: [1, 0.4, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--primary)' }} />
+                                        TRIP IS CURRENTLY LIVE
+                                    </motion.div>
+                                )}
                                 <button className="btn btn-primary" onClick={() => setActiveTab('attendance')}><ClipboardCheck size={18} /> Mark Attendance</button>
-                                <button className="btn btn-danger"><AlertTriangle size={18} /> Broadcast Alert</button>
                                 <button className="btn btn-outline" onClick={() => setActiveTab('requests')}><FileEdit size={18} /> Review Requests</button>
                             </div>
                         </motion.div>
@@ -205,20 +237,23 @@ const InchargeDashboard = () => {
                     <div className="section-card animate-fade-in">
                         <h3 className="section-title"><Settings2 size={20} className="text-primary" /> Daily Inspection Checklist</h3>
                         <div style={{ display: 'grid', gap: '1rem' }}>
-                            {inspection.map(check => (
-                                <div key={check.id} className="glass" style={{ padding: '1rem 1.5rem', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <check.icon className="text-primary" size={20} />
-                                        <span style={{ fontWeight: 600 }}>{check.item}</span>
+                            {inspection.map(check => {
+                                const IconComp = { ShieldCheck, Settings2, ClipboardCheck, Users }[check.icon] || Settings2;
+                                return (
+                                    <div key={check.id} className="glass" style={{ padding: '1rem 1.5rem', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <IconComp className="text-primary" size={20} />
+                                            <span style={{ fontWeight: 600 }}>{check.item}</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <span className={`badge badge-${check.status === 'Good' || check.status === 'Checked' ? 'success' : 'warning'}`}>{check.status}</span>
+                                            <button className={`btn ${check.status === 'Good' || check.status === 'Checked' ? 'btn-outline' : 'btn-primary'}`} style={{ padding: '4px 12px', fontSize: '0.8rem' }} onClick={() => toggleInspection(check.id)}>
+                                                {check.status === 'Good' || check.status === 'Checked' ? 'Reset' : 'Mark OK'}
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                        <span className={`badge badge-${check.status === 'Good' || check.status === 'Checked' ? 'success' : 'warning'}`}>{check.status}</span>
-                                        <button className={`btn ${check.status === 'Good' || check.status === 'Checked' ? 'btn-outline' : 'btn-primary'}`} style={{ padding: '4px 12px', fontSize: '0.8rem' }} onClick={() => toggleInspection(check.id)}>
-                                            {check.status === 'Good' || check.status === 'Checked' ? 'Reset' : 'Mark OK'}
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 );

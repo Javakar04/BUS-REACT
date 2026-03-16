@@ -15,10 +15,13 @@ import {
     Trash2,
     X,
     Clock,
-    UserCircle,
+    Zap,
+    UserPlus,
+    Bell,
     Map
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 // Separate Modal Component for stability
 const CRUDModal = ({ isOpen, onClose, onSave, type, data, setData }) => {
@@ -152,31 +155,32 @@ const AdminDashboard = () => {
     const [isModalOpen, setIsModalOpen] = React.useState(false);
     const [modalData, setModalData] = React.useState(null);
     const [modalType, setModalType] = React.useState(''); // 'student' or 'bus'
+    const [searchTerm, setSearchTerm] = React.useState('');
 
-    // Mock initial data state
-    const [students, setStudents] = React.useState([
+    // Persistent initial data state
+    const [students, setStudents] = useLocalStorage('bus_students', [
         { id: '1', name: 'Rahul Sharma', studentId: 'KPR-24-CS-042', route: 'Route #12', contact: '+91 98765 43210' },
         { id: '2', name: 'Priya Mani', studentId: 'KPR-24-EC-015', route: 'Route #05', contact: '+91 98765 43215' },
         { id: '3', name: 'Arjun Das', studentId: 'KPR-24-ME-089', route: 'Route #12', contact: '+91 98765 43212' },
     ]);
 
-    const [buses, setBuses] = React.useState([
+    const [buses, setBuses] = useLocalStorage('bus_vehicles', [
         { id: '1', number: 'TN-37-AZ-1234', driver: 'S. Rajesh', status: 'Active', capacity: '52' },
         { id: '2', number: 'TN-37-BY-5678', driver: 'M. Kumar', status: 'In Repair', capacity: '40' },
         { id: '3', number: 'TN-37-CK-9012', driver: 'K. Balaji', status: 'Active', capacity: '52' },
     ]);
 
-    const [incharges, setIncharges] = React.useState([
+    const [incharges, setIncharges] = useLocalStorage('bus_incharges', [
         { id: '1', name: 'Prof. Kumar', department: 'CSE', contact: '+91 94432 10001', assignedBus: 'TN-37-AZ-1234' },
         { id: '2', name: 'Dr. Sarah', department: 'ECE', contact: '+91 94432 10002', assignedBus: 'TN-37-BY-5678' },
     ]);
 
-    const [routes, setRoutes] = React.useState([
+    const [routes, setRoutes] = useLocalStorage('bus_routes', [
         { id: '1', name: 'Route #12', path: 'Saravanampatty -> Gandhipuram', stops: '8', timing: '07:30 AM' },
         { id: '2', name: 'Route #05', path: 'Peelamedu -> Hope College', stops: '12', timing: '07:15 AM' },
     ]);
 
-    const [broadcasts, setBroadcasts] = React.useState([
+    const [broadcasts, setBroadcasts] = useLocalStorage('bus_broadcasts', [
         { id: 1, title: 'Exam Special Bus', content: 'Special buses will run at 5 PM for exam students.', date: '2026-02-23' },
         { id: 2, title: 'Route #05 Delayed', content: 'Due to traffic, Route 5 is running 15 mins late.', date: '2026-02-22' },
     ]);
@@ -237,46 +241,84 @@ const AdminDashboard = () => {
     ];
 
     const renderContent = () => {
+        const stats = [
+            { label: 'Total Buses', value: buses.length, icon: Bus },
+            { label: 'Active Students', value: students.length, icon: Users },
+            { label: 'Incharges', value: incharges.length, icon: ShieldCheck },
+            { label: 'Active Routes', value: routes.length, icon: Map },
+        ];
+
         switch (activeTab) {
             case 'dashboard':
                 return (
-                    <>
-                        <div className="stats-grid">
-                            {[
-                                { label: 'Total Buses', value: buses.length, icon: Bus },
-                                { label: 'Active Students', value: students.length, icon: Users },
-                                { label: 'Incharges', value: incharges.length, icon: ShieldCheck },
-                                { label: 'Active Routes', value: routes.length, icon: Map },
-                            ].map((stat, index) => (
-                                <motion.div key={index} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="stat-card">
-                                    <div className="stat-icon-wrapper" style={{ background: `hsla(var(--primary-h), var(--primary-s), var(--primary-l), 0.1)`, color: 'var(--primary)' }}>
-                                        <stat.icon size={24} />
+                    <div className="animate-fade-in" style={{ display: 'grid', gap: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem' }}>
+                            {stats.map((stat, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1 }}
+                                    className="stats-card"
+                                >
+                                    <div className="stats-icon"><stat.icon size={24} /></div>
+                                    <div className="stats-info">
+                                        <div className="stats-value">{stat.value}</div>
+                                        <div className="stats-label">{stat.label}</div>
                                     </div>
-                                    <div className="stat-value">{stat.value}</div>
-                                    <div className="stat-label">{stat.label}</div>
                                 </motion.div>
                             ))}
                         </div>
 
-                        <div className="section-card">
-                            <h3 className="section-title"><Clock size={20} className="text-primary" /> System Activity Overview</h3>
-                            <div style={{ display: 'grid', gap: '0.75rem' }}>
-                                {[
-                                    { text: "Exam Special Bus schedule updated", time: "12 mins ago", status: "success" },
-                                    { text: "Morning trip started (18 vehicles)", time: "1 hour ago", status: "primary" },
-                                    { text: "Maintenance alert: Bus TN-37-BY scheduled for engine check", time: "3 hours ago", status: "warning" },
-                                ].map((act, idx) => (
-                                    <div key={idx} className="glass" style={{ padding: '1rem', borderRadius: 'var(--radius-lg)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <div>
-                                            <span style={{ fontWeight: 600 }}>{act.text}</span>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{act.time}</div>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+                            {/* Quick Actions */}
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="section-card">
+                                <h3 className="section-title"><Zap size={20} className="text-primary" /> Management Quick Actions</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1rem' }}>
+                                    <button className="btn btn-outline" style={{ height: '80px', flexDirection: 'column', gap: '0.5rem' }} onClick={() => handleAdd('student')}>
+                                        <UserPlus size={20} /> Add Student
+                                    </button>
+                                    <button className="btn btn-outline" style={{ height: '80px', flexDirection: 'column', gap: '0.5rem' }} onClick={() => handleAdd('bus')}>
+                                        <Bus size={20} /> Add Vehicle
+                                    </button>
+                                    <button className="btn btn-outline" style={{ height: '80px', flexDirection: 'column', gap: '0.5rem' }} onClick={() => handleAdd('broadcast')}>
+                                        <Bell size={20} /> New Broadcast
+                                    </button>
+                                    <button className="btn btn-outline" style={{ height: '80px', flexDirection: 'column', gap: '0.5rem' }} onClick={() => setActiveTab('routes')}>
+                                        <Map size={20} /> Manage Routes
+                                    </button>
+                                </div>
+                            </motion.div>
+
+                            {/* System Health */}
+                            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="section-card">
+                                <h3 className="section-title"><ShieldCheck size={20} className="text-primary" /> System Capacity</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                            <span style={{ fontWeight: 600 }}>Total Seat Occupancy</span>
+                                            <span style={{ color: 'var(--primary)', fontWeight: 700 }}>84%</span>
                                         </div>
-                                        <span className={`badge badge-${act.status === 'success' ? 'success' : act.status === 'warning' ? 'warning' : 'primary'}`} style={{ textTransform: 'capitalize' }}>{act.status}</span>
+                                        <div style={{ width: '100%', height: '8px', background: 'var(--bg-main)', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <motion.div initial={{ width: 0 }} animate={{ width: '84%' }} transition={{ duration: 1, ease: 'easeOut' }} style={{ height: '100%', background: 'var(--primary)' }} />
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
+                                    <div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.85rem' }}>
+                                            <span style={{ fontWeight: 600 }}>Incharge Report Status</span>
+                                            <span style={{ color: 'hsl(142, 76%, 36%)', fontWeight: 700 }}>100% OK</span>
+                                        </div>
+                                        <div style={{ width: '100%', height: '8px', background: 'var(--bg-main)', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <motion.div initial={{ width: 0 }} animate={{ width: '100%' }} transition={{ duration: 1, delay: 0.5 }} style={{ height: '100%', background: 'hsl(142, 76%, 36%)' }} />
+                                        </div>
+                                    </div>
+                                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', marginTop: '0.5rem' }}>
+                                        All systems are functioning normally. No critical issues reported today.
+                                    </p>
+                                </div>
+                            </motion.div>
                         </div>
-                    </>
+                    </div>
                 );
             case 'attendance':
                 return (
@@ -314,12 +356,80 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 );
-            case 'students':
+            case 'buses':
+                const filteredBuses = buses.filter(b =>
+                    b.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    b.driver.toLowerCase().includes(searchTerm.toLowerCase())
+                );
                 return (
-                    <div className="section-card animate-fade-in">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <div className="section-card animate-fade-in" key="buses-tab">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <h3 className="section-title" style={{ marginBottom: 0 }}><Bus size={20} className="text-primary" /> Bus Fleet</h3>
+                            <div style={{ display: 'flex', gap: '0.75rem', flex: 1, maxWidth: '400px' }}>
+                                <input
+                                    className="form-input"
+                                    placeholder="Search buses..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ margin: 0 }}
+                                />
+                                <button className="btn btn-primary" onClick={() => handleAdd('bus')} style={{ whiteSpace: 'nowrap' }}><Plus size={18} /> Add Bus</button>
+                            </div>
+                        </div>
+                        <div className="data-table-container">
+                            <table className="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Bus Number</th>
+                                        <th>Driver</th>
+                                        <th>Status</th>
+                                        <th>Capacity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredBuses.map((bus) => (
+                                        <tr key={bus.id}>
+                                            <td style={{ fontWeight: 800 }}>{bus.number}</td>
+                                            <td>{bus.driver}</td>
+                                            <td>
+                                                <span className={`badge badge-${bus.status === 'Active' ? 'success' : bus.status === 'In Repair' ? 'danger' : 'warning'}`}>
+                                                    {bus.status}
+                                                </span>
+                                            </td>
+                                            <td>{bus.capacity} Seats</td>
+                                            <td>
+                                                <div className="action-buttons">
+                                                    <button className="btn-icon" onClick={() => handleEdit('bus', bus)}><Edit size={16} /></button>
+                                                    <button className="btn-icon delete" onClick={() => handleDelete('bus', bus.id)}><Trash2 size={16} /></button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                );
+            case 'students':
+                const filteredStudents = students.filter(s =>
+                    s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    s.studentId.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                return (
+                    <div className="section-card animate-fade-in" key="students-tab">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem', marginBottom: '1.5rem' }}>
                             <h3 className="section-title" style={{ marginBottom: 0 }}><Users size={20} className="text-primary" /> Student Directory</h3>
-                            <button className="btn btn-primary" onClick={() => handleAdd('student')}><Plus size={18} /> Add Student</button>
+                            <div style={{ display: 'flex', gap: '0.75rem', flex: 1, maxWidth: '400px' }}>
+                                <input
+                                    className="form-input"
+                                    placeholder="Search students..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    style={{ margin: 0 }}
+                                />
+                                <button className="btn btn-primary" onClick={() => handleAdd('student')} style={{ whiteSpace: 'nowrap' }}><Plus size={18} /> Add Student</button>
+                            </div>
                         </div>
                         <div className="data-table-container">
                             <table className="data-table">
@@ -333,58 +443,16 @@ const AdminDashboard = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {students.map((student) => (
+                                    {filteredStudents.map((student) => (
                                         <tr key={student.id}>
                                             <td style={{ fontWeight: 600 }}>{student.name}</td>
-                                            <td><code style={{ background: 'var(--bg-main)', padding: '2px 6px', borderRadius: '4px' }}>{student.studentId}</code></td>
+                                            <td><code>{student.studentId}</code></td>
                                             <td>{student.route}</td>
                                             <td>{student.contact}</td>
                                             <td>
                                                 <div className="action-buttons">
                                                     <button className="btn-icon" onClick={() => handleEdit('student', student)}><Edit size={16} /></button>
                                                     <button className="btn-icon delete" onClick={() => handleDelete('student', student.id)}><Trash2 size={16} /></button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                );
-            case 'buses':
-                return (
-                    <div className="section-card animate-fade-in">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3 className="section-title" style={{ marginBottom: 0 }}><Bus size={20} className="text-primary" /> Fleet Management</h3>
-                            <button className="btn btn-primary" onClick={() => handleAdd('bus')}><Plus size={18} /> Add Vehicle</button>
-                        </div>
-                        <div className="data-table-container">
-                            <table className="data-table">
-                                <thead>
-                                    <tr>
-                                        <th>Bus Number</th>
-                                        <th>Driver</th>
-                                        <th>Capacity</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {buses.map((bus) => (
-                                        <tr key={bus.id}>
-                                            <td style={{ fontWeight: 800 }}>{bus.number}</td>
-                                            <td>{bus.driver}</td>
-                                            <td>{bus.capacity} seats</td>
-                                            <td>
-                                                <span className={`badge badge-${bus.status === 'Active' ? 'success' : bus.status === 'In Repair' ? 'danger' : 'warning'}`}>
-                                                    {bus.status}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div className="action-buttons">
-                                                    <button className="btn-icon" onClick={() => handleEdit('bus', bus)}><Edit size={16} /></button>
-                                                    <button className="btn-icon delete" onClick={() => handleDelete('bus', bus.id)}><Trash2 size={16} /></button>
                                                 </div>
                                             </td>
                                         </tr>

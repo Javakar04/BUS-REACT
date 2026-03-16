@@ -8,19 +8,24 @@ import {
     AlertCircle,
     Mail,
     Phone,
-    GraduationCap
+    GraduationCap,
+    Clock,
+    Bus
 } from 'lucide-react';
 import DashboardLayout from '../components/DashboardLayout';
+import { useLocalStorage } from '../hooks/useLocalStorage';
 
 const StudentPortal = () => {
-    const [activeTab, setActiveTab] = React.useState('profile');
+    const [activeTab, setActiveTab] = React.useState('profile-tab');
+    const [tripActive] = useLocalStorage('bus_trip_active', false);
+    const [currentLocation] = useLocalStorage('bus_current_location', 'Campus Depot');
 
     const navItems = [
-        { id: 'profile', label: 'My Profile', icon: UserCircle },
-        { id: 'attendance', label: 'Attendance', icon: CalendarDays },
-        { id: 'transport', label: 'Transport Details', icon: BusFront },
-        { id: 'requests', label: 'Service Requests', icon: Target },
-        { id: 'support', label: 'Help & Support', icon: AlertCircle },
+        { id: 'profile-tab', label: 'My Profile', icon: UserCircle },
+        { id: 'attendance-tab', label: 'Attendance', icon: CalendarDays },
+        { id: 'transport-tab', label: 'Transport Details', icon: BusFront },
+        { id: 'requests-tab', label: 'Service Requests', icon: Target },
+        { id: 'support-tab', label: 'Help & Support', icon: AlertCircle },
     ];
 
     const profile = {
@@ -41,9 +46,9 @@ const StudentPortal = () => {
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'profile':
+            case 'profile-tab':
                 return (
-                    <div className="profile-container animate-fade-in">
+                    <div className="profile-container animate-fade-in" key="profile">
                         <motion.div
                             initial={{ x: -20, opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
@@ -83,9 +88,9 @@ const StudentPortal = () => {
                         </motion.div>
                     </div>
                 );
-            case 'attendance':
+            case 'attendance-tab':
                 return (
-                    <div className="section-card animate-fade-in">
+                    <div className="section-card animate-fade-in" key="attendance">
                         <h3 className="section-title"><CalendarDays size={20} className="text-primary" /> Transport Attendance</h3>
                         <div className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }}>
                             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', textAlign: 'center' }}>
@@ -95,31 +100,40 @@ const StudentPortal = () => {
                         </div>
                     </div>
                 );
-            case 'transport':
+            case 'transport-tab':
                 return (
-                    <div className="section-card animate-fade-in">
+                    <div className="section-card animate-fade-in" key="transport">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                             <h3 className="section-title" style={{ marginBottom: 0 }}><BusFront size={20} className="text-primary" /> Bus Details</h3>
-                            <div className="glass" style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 600 }}>
-                                <motion.div
-                                    animate={{ opacity: [1, 0.4, 1] }}
-                                    transition={{ duration: 1.5, repeat: Infinity }}
-                                    style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#ff3b30' }}
-                                />
-                                LIVE TRACKING ACTIVE
-                            </div>
+                            {tripActive ? (
+                                <div className="glass" style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 600, border: '1px solid hsla(142, 76%, 36%, 0.3)' }}>
+                                    <motion.div
+                                        animate={{ opacity: [1, 0.4, 1] }}
+                                        transition={{ duration: 1.5, repeat: Infinity }}
+                                        style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'hsl(142, 76%, 36%)' }}
+                                    />
+                                    TRIP IN PROGRESS
+                                </div>
+                            ) : (
+                                <div className="glass" style={{ padding: '0.4rem 0.8rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                                    <Clock size={14} />
+                                    BUS AT DEPOT
+                                </div>
+                            )}
                         </div>
                         <div className="glass" style={{ padding: '1.5rem', borderRadius: 'var(--radius-lg)' }}>
                             <div className="info-item"><span className="info-key">Bus Route</span><span className="info-val">Route #12 (Saravanampatty)</span></div>
                             <div className="info-item"><span className="info-key">Boarding Point</span><span className="info-val">Signal Junction</span></div>
                             <div className="info-item"><span className="info-key">Pick-up Time</span><span className="info-val">07:45 AM</span></div>
-                            <div className="info-item"><span className="info-key">Current Status</span><span className="info-val" style={{ color: 'var(--primary)' }}>In Transit - Near Peelamedu</span></div>
+                            <div className="info-item"><span className="info-key">Current Status</span><span className="info-val" style={{ color: tripActive ? 'var(--primary)' : 'var(--text-muted)' }}>
+                                {tripActive ? currentLocation : 'Not Started Yet'}
+                            </span></div>
                         </div>
                     </div>
                 );
-            case 'requests':
+            case 'requests-tab':
                 return (
-                    <div className="section-card animate-fade-in">
+                    <div className="section-card animate-fade-in" key="requests">
                         <h3 className="section-title"><Target size={20} className="text-primary" /> Service Request Submission</h3>
                         <form className="glass" style={{ padding: '2rem', borderRadius: 'var(--radius-lg)' }} onSubmit={(e) => { e.preventDefault(); alert('Request submitted successfully!'); }}>
                             <div className="form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
@@ -149,9 +163,9 @@ const StudentPortal = () => {
                         </form>
                     </div>
                 );
-            case 'support':
+            case 'support-tab':
                 return (
-                    <div className="section-card animate-fade-in">
+                    <div className="section-card animate-fade-in" key="support">
                         <h3 className="section-title"><AlertCircle size={20} className="text-primary" /> Frequently Asked Questions</h3>
                         <div style={{ display: 'grid', gap: '1rem' }}>
                             {[
