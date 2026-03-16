@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "id": "A001",
+      "username": "admin",
+      "password": "admin",
+      "role": "admin",
+      "name": "Arun Kumar"
+    },
+    {
+      "id": "I001",
+      "username": "incharge",
+      "password": "incharge",
+      "role": "incharge",
+      "name": "Karthik S"
+    },
+    {
+      "id": "S042",
+      "username": "student",
+      "password": "student",
+      "role": "student",
+      "name": "Rahul Sharma",
+      "dept": "Computer Science & Engineering",
+      "batch": "2024 - 2027 (II year)",
+      "bloodGroup": "O+",
+      "phone": "+91 98765 43210",
+      "busRoute": "Route #12",
+      "boardingPoint": "Saravanampatty Signal"
+    }
+  ],
+  "studentData": {
+    "S042": {
+      "attendance": {
+        "present": 142,
+        "absent": 8,
+        "leave": 6,
+        "total": 156,
+        "percentage": 91
+      },
+      "route": {
+        "active": false,
+        "currentLocation": "Campus Depot",
+        "stops": [
+          { "name": "Saravanampatty Signal", "time": "07:45 AM", "status": "completed" },
+          { "name": "Prozone Mall", "time": "08:00 AM", "status": "completed" },
+          { "name": "Hope College", "time": "08:15 AM", "status": "pending" },
+          { "name": "KPR Campus", "time": "08:45 AM", "status": "pending" }
+        ]
+      },
+      "requests": [
+        { "id": "REQ001", "type": "Route Change", "status": "Resolved", "date": "Oct 12, 2023" },
+        { "id": "REQ002", "type": "Bus Pass Renewal", "status": "Pending", "date": "Nov 05, 2023" }
+      ]
+    }
+  },
+  "adminData": {
+    "stats": {
+      "totalBuses": 45,
+      "activeRoutes": 42,
+      "totalStudents": 2450,
+      "alerts": 3
+    },
+    "recentAlerts": [
+      { "id": 1, "route": "Route 12", "issue": "Delayed by 15 mins due to traffic", "type": "warning", "time": "08:10 AM" },
+      { "id": 2, "route": "Route 05", "issue": "Vehicle Breakdown - Backup dispatched", "type": "critical", "time": "07:45 AM" },
+      { "id": 3, "route": "Route 28", "issue": "Completed trip successfully", "type": "success", "time": "08:50 AM" }
+    ],
+    "fleetStatus": [
+      { "route": "Route 12 (Peelamedu)", "busId": "TN 38 BX 8055", "status": "On Route", "occupancy": "42/50" },
+      { "route": "Route 05 (Vadavalli)", "busId": "TN 38 BX 9122", "status": "Delayed", "occupancy": "38/50" },
+      { "route": "Route 28 (Saravanampatti)", "busId": "TN 38 BX 4451", "status": "Arrived", "occupancy": "48/50" }
+    ]
+  },
+  "inchargeData": {
+    "stats": {
+      "totalStudents": 50,
+      "presentToday": 42,
+      "absentToday": 8,
+      "routeStatus": "On Time"
+    },
+    "routeDetails": {
+      "routeName": "Route 12",
+      "driverName": "Senthil Kumar",
+      "busNumber": "TN 38 BX 8055",
+      "departureTime": "07:30 AM",
+      "estimatedArrival": "08:45 AM"
+    },
+    "students": [
+      { "id": "S101", "name": "Rahul Sharma", "status": "Present", "boardingPoint": "Hope College" },
+      { "id": "S102", "name": "Priya Patel", "status": "Absent", "boardingPoint": "Peelamedu Signal" },
+      { "id": "S103", "name": "Arun Kumar", "status": "Present", "boardingPoint": "Sitra" }
+    ]
+  }
+}

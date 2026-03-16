@@ -17,24 +17,37 @@ const Login = () => {
     };
 
     const [error, setError] = React.useState('');
+    const [isLoading, setIsLoading] = React.useState(false);
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         const username = e.target[0].value;
         const password = e.target[1].value;
 
-        // Simple Mock Auth Logic
-        if (role === 'admin' && username === 'admin' && password === 'admin') {
-            localStorage.setItem('user_role', 'admin');
-            navigate('/admin/dashboard');
-        } else if (role === 'incharge' && username === 'incharge' && password === 'incharge') {
-            localStorage.setItem('user_role', 'incharge');
-            navigate('/incharge/dashboard');
-        } else if (role === 'student' && username === 'student' && password === 'student') {
-            localStorage.setItem('user_role', 'student');
-            navigate('/student/dashboard');
-        } else {
-            setError('Invalid username or password. Please try again.');
+        setIsLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('http://localhost:5000/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, role })
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                localStorage.setItem('user_token', data.token);
+                localStorage.setItem('user_role', role);
+                localStorage.setItem('user_data', JSON.stringify(data.user));
+                navigate(`/${role}/dashboard`);
+            } else {
+                setError(data.message || 'Invalid username or password.');
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            setError('Server connection failed. Please try again later.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
